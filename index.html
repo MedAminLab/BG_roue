@@ -62,18 +62,50 @@
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
             background: conic-gradient(
                 from 0deg,
-                #ff6b6b 0deg 36deg,
-                #4ecdc4 36deg 72deg,
-                #ffe66d 72deg 108deg,
-                #a8e6cf 108deg 144deg,
-                #ff8787 144deg 180deg,
-                #74b9ff 180deg 216deg,
-                #ffa07a 216deg 252deg,
-                #98d8c8 252deg 288deg,
-                #f7b731 288deg 324deg,
-                #5f27cd 324deg 360deg
+                #4ecdc4 0deg 90deg,
+                #ff6b6b 90deg 180deg,
+                #4ecdc4 180deg 270deg,
+                #ff6b6b 270deg 360deg
             );
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wheel-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .wheel-text span {
+            position: absolute;
+            left: 50%;
+            transform-origin: 0 0;
+            width: 50%;
+            text-align: center;
+            line-height: 0;
+        }
+
+        .wheel-text span:nth-child(1) {
+            transform: translate(-50%, -50%) rotate(45deg) translateX(120px);
+        }
+
+        .wheel-text span:nth-child(2) {
+            transform: translate(-50%, -50%) rotate(135deg) translateX(120px);
+        }
+
+        .wheel-text span:nth-child(3) {
+            transform: translate(-50%, -50%) rotate(225deg) translateX(120px);
+        }
+
+        .wheel-text span:nth-child(4) {
+            transform: translate(-50%, -50%) rotate(315deg) translateX(120px);
         }
 
         .wheel-center {
@@ -179,13 +211,15 @@
         <h1>🎰 Roue de la Chance 🎰</h1>
         <p class="subtitle">Tentez de gagner un grille-pain !</p>
         
-        <div class="prizes-left">
-            Cadeaux restants : <strong id="prizesLeft">10</strong> / 10
-        </div>
-
         <div class="wheel-container">
             <div class="pointer"></div>
             <div class="wheel" id="wheel">
+                <div class="wheel-text">
+                    <span>GAGNÉ</span>
+                    <span>PERDU</span>
+                    <span>GAGNÉ</span>
+                    <span>PERDU</span>
+                </div>
                 <div class="wheel-center"></div>
             </div>
         </div>
@@ -258,8 +292,7 @@
         }
 
         function updatePrizesDisplay() {
-            const remaining = state.totalPrizes - state.currentPrizeIndex;
-            document.getElementById('prizesLeft').textContent = remaining;
+            // Ne plus afficher le compteur
         }
 
         function isWithinTimeRange() {
@@ -307,9 +340,11 @@
             let finalRotation;
             
             if (isWinner) {
-                finalRotation = baseRotation + 0;
+                const winAngles = [0, 180];
+                const randomWinAngle = winAngles[Math.floor(Math.random() * winAngles.length)];
+                finalRotation = baseRotation + randomWinAngle;
             } else {
-                const loseAngles = [180, 36, 72, 108, 144, 216, 252, 288, 324];
+                const loseAngles = [90, 270];
                 const randomLoseAngle = loseAngles[Math.floor(Math.random() * loseAngles.length)];
                 finalRotation = baseRotation + randomLoseAngle;
             }
