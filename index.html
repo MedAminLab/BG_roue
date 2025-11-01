@@ -25,10 +25,10 @@
         .container {
             background: white;
             border-radius: 20px;
-            padding: 40px;
+            padding: clamp(20px, 5vw, 40px);
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             max-width: 600px;
-            width: 100%;
+            width: 95%;
             text-align: center;
         }
 
@@ -89,19 +89,19 @@
         }
 
         .wheel-text span:nth-child(1) {
-            transform: translate(-50%, -50%) rotate(-45deg) translateY(min(-130px, -32vw)) rotate(45deg);
+            transform: translate(-50%, -50%) rotate(-45deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(45deg);
         }
 
         .wheel-text span:nth-child(2) {
-            transform: translate(-50%, -50%) rotate(45deg) translateY(min(-130px, -32vw)) rotate(-45deg);
+            transform: translate(-50%, -50%) rotate(45deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(-45deg);
         }
 
         .wheel-text span:nth-child(3) {
-            transform: translate(-50%, -50%) rotate(135deg) translateY(min(-130px, -32vw)) rotate(-135deg);
+            transform: translate(-50%, -50%) rotate(135deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(-135deg);
         }
 
         .wheel-text span:nth-child(4) {
-            transform: translate(-50%, -50%) rotate(225deg) translateY(min(-130px, -32vw)) rotate(-225deg);
+            transform: translate(-50%, -50%) rotate(225deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(-225deg);
         }
 
         .wheel-center {
@@ -109,8 +109,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
+            width: min(60px, 15vw);
+            height: min(60px, 15vw);
             background: #333;
             border-radius: 50%;
             border: 5px solid white;
@@ -124,9 +124,9 @@
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 40px solid #ff6b6b;
+            border-left: clamp(15px, 4vw, 20px) solid transparent;
+            border-right: clamp(15px, 4vw, 20px) solid transparent;
+            border-top: clamp(30px, 8vw, 40px) solid #ff6b6b;
             z-index: 5;
             filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
         }
@@ -203,6 +203,31 @@
         .celebrate {
             animation: celebration 0.5s ease-in-out 3;
         }
+
+        .stock-counter {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            font-size: 1.2em;
+            color: #856404;
+        }
+
+        .stock-counter strong {
+            color: #d39e00;
+            font-size: 1.4em;
+        }
+
+        .stock-empty {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .stock-empty strong {
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -228,64 +253,63 @@
         </button>
 
         <div class="result" id="result"></div>
+
+        <div class="stock-counter" id="stockCounter">
+            📦 Stock disponible : <strong id="stockNumber">10</strong> grille-pains
+        </div>
     </div>
 
     <script>
         const state = {
-            prizes: [],
-            currentPrizeIndex: 0,
+            winnersCount: 0,
             isSpinning: false,
             totalPrizes: 10
         };
 
-        function initializePrizes() {
-            const now = new Date();
-            const today = now.toDateString();
-            
-            const stored = localStorage.getItem('wheelState');
+        function initializeState() {
+            const stored = localStorage.getItem('wheelGameState');
             if (stored) {
                 const data = JSON.parse(stored);
-                if (data.date === today) {
-                    state.prizes = data.prizes;
-                    state.currentPrizeIndex = data.currentPrizeIndex;
-                    updatePrizesDisplay();
-                    return;
+                const now = new Date();
+                const storedDate = new Date(data.date);
+                
+                // Vérifier si c'est le même jour
+                if (now.toDateString() === storedDate.toDateString()) {
+                    state.winnersCount = data.winnersCount || 0;
+                } else {
+                    // Nouveau jour, réinitialiser
+                    state.winnersCount = 0;
+                    saveState();
                 }
             }
-            
-            generateDailyPrizes();
-        }
-
-        function generateDailyPrizes() {
-            state.prizes = [];
-            const winPositions = new Set();
-            
-            while (winPositions.size < state.totalPrizes) {
-                const hour = Math.floor(Math.random() * 13) + 7;
-                const minute = Math.floor(Math.random() * 60);
-                const time = hour * 60 + minute;
-                winPositions.add(time);
-            }
-            
-            state.prizes = Array.from(winPositions).sort((a, b) => a - b);
-            state.currentPrizeIndex = 0;
-            
-            saveState();
-            updatePrizesDisplay();
+            updateStockDisplay();
         }
 
         function saveState() {
             const now = new Date();
             const data = {
-                date: now.toDateString(),
-                prizes: state.prizes,
-                currentPrizeIndex: state.currentPrizeIndex
+                date: now.toISOString(),
+                winnersCount: state.winnersCount
             };
-            localStorage.setItem('wheelState', JSON.stringify(data));
+            localStorage.setItem('wheelGameState', JSON.stringify(data));
         }
 
-        function updatePrizesDisplay() {
-            // Ne plus afficher le compteur
+        function updateStockDisplay() {
+            const remaining = state.totalPrizes - state.winnersCount;
+            const stockNumber = document.getElementById('stockNumber');
+            const stockCounter = document.getElementById('stockCounter');
+            
+            stockNumber.textContent = remaining;
+            
+            if (remaining === 0) {
+                stockCounter.className = 'stock-counter stock-empty';
+                stockCounter.innerHTML = '❌ <strong>Stock épuisé</strong> - Tous les grille-pains ont été gagnés aujourd\'hui !';
+            } else if (remaining <= 3) {
+                stockCounter.style.background = '#fff3cd';
+                stockCounter.innerHTML = `⚠️ Plus que <strong>${remaining}</strong> grille-pain${remaining > 1 ? 's' : ''} disponible${remaining > 1 ? 's' : ''} !`;
+            } else {
+                stockCounter.innerHTML = `📦 Stock disponible : <strong>${remaining}</strong> grille-pains`;
+            }
         }
 
         function isWithinTimeRange() {
@@ -295,20 +319,13 @@
         }
 
         function shouldWin() {
-            if (state.currentPrizeIndex >= state.prizes.length) {
+            // Vérifier s'il reste des cadeaux
+            if (state.winnersCount >= state.totalPrizes) {
                 return false;
             }
             
-            const now = new Date();
-            const currentTime = now.getHours() * 60 + now.getMinutes();
-            const nextPrizeTime = state.prizes[state.currentPrizeIndex];
-            
-            // Si c'est l'heure d'un cadeau, 50% de chance de gagner pour ajouter de l'aléatoire
-            if (currentTime >= nextPrizeTime) {
-                return Math.random() < 0.5;
-            }
-            
-            return false;
+            // Probabilité de gain : 30% de chance
+            return Math.random() < 0.30;
         }
 
         function spin() {
@@ -320,9 +337,9 @@
                 return;
             }
 
-            if (state.currentPrizeIndex >= state.totalPrizes) {
+            if (state.winnersCount >= state.totalPrizes) {
                 document.getElementById('result').className = 'result lose';
-                document.getElementById('result').textContent = '😔 Tous les cadeaux ont été distribués aujourd\'hui !';
+                document.getElementById('result').textContent = '😔 Désolé, tous les grille-pains ont déjà été gagnés aujourd\'hui !';
                 return;
             }
 
@@ -357,20 +374,20 @@
                 const resultDiv = document.getElementById('result');
                 
                 if (isWinner) {
-                    state.currentPrizeIndex++;
+                    state.winnersCount++;
                     saveState();
-                    updatePrizesDisplay();
+                    updateStockDisplay();
                     
                     resultDiv.className = 'result win celebrate';
                     resultDiv.textContent = '🎉 FÉLICITATIONS ! Vous avez gagné un grille-pain ! 🎉';
                 } else {
                     resultDiv.className = 'result lose';
-                    resultDiv.textContent = '😔 Dommage ! Réessayez plus tard !';
+                    resultDiv.textContent = '😔 Dommage ! Réessayez votre chance !';
                 }
             }, 4000);
         }
 
-        window.onload = initializePrizes;
+        window.onload = initializeState;
     </script>
 </body>
 </html>
