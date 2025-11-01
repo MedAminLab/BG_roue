@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f5dc;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -333,15 +333,16 @@
             const wheel = document.getElementById('wheel');
             const isWinner = shouldWin();
             
-            const baseRotation = 1800;
+            const spins = 5;
+            const baseRotation = 360 * spins;
             let finalRotation;
             
             if (isWinner) {
-                const winAngles = [0, 180];
+                const winAngles = [45, 225];
                 const randomWinAngle = winAngles[Math.floor(Math.random() * winAngles.length)];
                 finalRotation = baseRotation + randomWinAngle;
             } else {
-                const loseAngles = [90, 270];
+                const loseAngles = [135, 315];
                 const randomLoseAngle = loseAngles[Math.floor(Math.random() * loseAngles.length)];
                 finalRotation = baseRotation + randomLoseAngle;
             }
