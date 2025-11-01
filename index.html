@@ -228,6 +228,17 @@
         .stock-empty strong {
             color: #721c24;
         }
+
+        .last-winner {
+            margin-top: 15px;
+            padding: 15px;
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            border-radius: 10px;
+            font-size: 1.1em;
+            color: #0c5460;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -257,41 +268,90 @@
         <div class="stock-counter" id="stockCounter">
             📦 Stock disponible : <strong id="stockNumber">10</strong> grille-pains
         </div>
+
+        <div class="last-winner" id="lastWinner">
+            🎉 Dernier gagnant à --:--
+        </div>
     </div>
 
     <script>
         const state = {
             winnersCount: 0,
             isSpinning: false,
-            totalPrizes: 10
+            totalPrizes: 10,
+            lastWinner: null
         };
 
-        function initializeState() {
-            const stored = localStorage.getItem('wheelGameState');
-            if (stored) {
-                const data = JSON.parse(stored);
-                const now = new Date();
-                const storedDate = new Date(data.date);
+        async function initializeState() {
+            try {
+                // Charger l'état partagé depuis le stockage persistant
+                const result = await window.storage.get('wheelGameState', true);
                 
-                // Vérifier si c'est le même jour
-                if (now.toDateString() === storedDate.toDateString()) {
-                    state.winnersCount = data.winnersCount || 0;
+                if (result && result.value) {
+                    const data = JSON.parse(result.value);
+                    const now = new Date();
+                    const storedDate = new Date(data.date);
+                    
+                    // Vérifier si c'est le même jour
+                    if (now.toDateString() === storedDate.toDateString()) {
+                        state.winnersCount = data.winnersCount || 0;
+                        state.lastWinner = data.lastWinner || null;
+                    } else {
+                        // Nouveau jour, réinitialiser
+                        state.winnersCount = 0;
+                        state.lastWinner = null;
+                        await saveState();
+                    }
                 } else {
-                    // Nouveau jour, réinitialiser
-                    state.winnersCount = 0;
-                    saveState();
+                    // Première initialisation
+                    await saveState();
                 }
+            } catch (error) {
+                console.log('Première initialisation du jeu');
+                state.winnersCount = 0;
+                state.lastWinner = null;
+                await saveState();
             }
+            
             updateStockDisplay();
+            displayLastWinner();
         }
 
-        function saveState() {
+        async function saveState() {
             const now = new Date();
             const data = {
                 date: now.toISOString(),
-                winnersCount: state.winnersCount
+                winnersCount: state.winnersCount,
+                lastWinner: state.lastWinner
             };
-            localStorage.setItem('wheelGameState', JSON.stringify(data));
+            
+            try {
+                await window.storage.set('wheelGameState', JSON.stringify(data), true);
+            } catch (error) {
+                console.error('Erreur de sauvegarde:', error);
+            }
+        }
+
+        async function refreshStock() {
+            // Recharger le stock depuis le serveur pour avoir les données à jour
+            try {
+                const result = await window.storage.get('wheelGameState', true);
+                if (result && result.value) {
+                    const data = JSON.parse(result.value);
+                    const now = new Date();
+                    const storedDate = new Date(data.date);
+                    
+                    if (now.toDateString() === storedDate.toDateString()) {
+                        state.winnersCount = data.winnersCount || 0;
+                        state.lastWinner = data.lastWinner || null;
+                    }
+                }
+            } catch (error) {
+                console.log('Erreur lors du rafraîchissement');
+            }
+            
+            updateStockDisplay();
+            displayLastWinner();
         }
 
         function updateStockDisplay() {
@@ -312,6 +372,18 @@
             }
         }
 
+        function displayLastWinner() {
+            const winnerDiv = document.getElementById('lastWinner');
+            if (state.lastWinner) {
+                const winTime = new Date(state.lastWinner.time);
+                const timeStr = winTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                winnerDiv.textContent = `🎉 Dernier gagnant à ${timeStr}`;
+                winnerDiv.style.display = 'block';
+            } else {
+                winnerDiv.style.display = 'none';
+            }
+        }
+
         function isWithinTimeRange() {
             const now = new Date();
             const hour = now.getHours();
@@ -328,8 +400,11 @@
             return Math.random() < 0.30;
         }
 
-        function spin() {
+        async function spin() {
             if (state.isSpinning) return;
+            
+            // Rafraîchir le stock avant de jouer
+            await refreshStock();
             
             if (!isWithinTimeRange()) {
                 document.getElementById('result').className = 'result lose';
@@ -367,7 +442,7 @@
 
             wheel.style.transform = `rotate(${finalRotation}deg)`;
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 state.isSpinning = false;
                 document.getElementById('spinButton').disabled = false;
 
@@ -375,8 +450,12 @@
                 
                 if (isWinner) {
                     state.winnersCount++;
-                    saveState();
+                    state.lastWinner = {
+                        time: new Date().toISOString()
+                    };
+                    await saveState();
                     updateStockDisplay();
+                    displayLastWinner();
                     
                     resultDiv.className = 'result win celebrate';
                     resultDiv.textContent = '🎉 FÉLICITATIONS ! Vous avez gagné un grille-pain ! 🎉';
@@ -386,6 +465,9 @@
                 }
             }, 4000);
         }
+
+        // Rafraîchir le stock toutes les 10 secondes
+        setInterval(refreshStock, 10000);
 
         window.onload = initializeState;
     </script>
