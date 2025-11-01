@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue de la Chance - Gagnez un Grille-Pain !</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 30px auto;
+            max-width: 90vw;
+            max-height: 90vw;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 15px solid #333;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            background: conic-gradient(
+                from 0deg,
+                #ff6b6b 0deg 36deg,
+                #4ecdc4 36deg 72deg,
+                #ffe66d 72deg 108deg,
+                #a8e6cf 108deg 144deg,
+                #ff8787 144deg 180deg,
+                #74b9ff 180deg 216deg,
+                #ffa07a 216deg 252deg,
+                #98d8c8 252deg 288deg,
+                #f7b731 288deg 324deg,
+                #5f27cd 324deg 360deg
+            );
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: #333;
+            border-radius: 50%;
+            border: 5px solid white;
+            z-index: 10;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff6b6b;
+            z-index: 5;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+        }
+
+        .spin-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+
+        .spin-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .spin-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result.win {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .result.lose {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-radius: 10px;
+            color: #004085;
+        }
+
+        .prizes-left {
+            margin-top: 15px;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        @keyframes celebration {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .celebrate {
+            animation: celebration 0.5s ease-in-out 3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 Roue de la Chance 🎰</h1>
+        <p class="subtitle">Tentez de gagner un grille-pain !</p>
+        
+        <div class="prizes-left">
+            Cadeaux restants : <strong id="prizesLeft">10</strong> / 10
+        </div>
+
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <div class="wheel-center"></div>
+            </div>
+        </div>
+
+        <button class="spin-button" id="spinButton" onclick="spin()">
+            TOURNER LA ROUE
+        </button>
+
+        <div class="result" id="result"></div>
+
+        <div class="info">
+            <strong>ℹ️ Information :</strong><br>
+            Tirage disponible de 7h à 20h<br>
+            10 grille-pains à gagner !
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            prizes: [],
+            currentPrizeIndex: 0,
+            isSpinning: false,
+            totalPrizes: 10
+        };
+
+        function initializePrizes() {
+            const now = new Date();
+            const today = now.toDateString();
+            
+            const stored = localStorage.getItem('wheelState');
+            if (stored) {
+                const data = JSON.parse(stored);
+                if (data.date === today) {
+                    state.prizes = data.prizes;
+                    state.currentPrizeIndex = data.currentPrizeIndex;
+                    updatePrizesDisplay();
+                    return;
+                }
+            }
+            
+            generateDailyPrizes();
+        }
+
+        function generateDailyPrizes() {
+            state.prizes = [];
+            const winPositions = new Set();
+            
+            while (winPositions.size < state.totalPrizes) {
+                const hour = Math.floor(Math.random() * 13) + 7;
+                const minute = Math.floor(Math.random() * 60);
+                const time = hour * 60 + minute;
+                winPositions.add(time);
+            }
+            
+            state.prizes = Array.from(winPositions).sort((a, b) => a - b);
+            state.currentPrizeIndex = 0;
+            
+            saveState();
+            updatePrizesDisplay();
+        }
+
+        function saveState() {
+            const now = new Date();
+            const data = {
+                date: now.toDateString(),
+                prizes: state.prizes,
+                currentPrizeIndex: state.currentPrizeIndex
+            };
+            localStorage.setItem('wheelState', JSON.stringify(data));
+        }
+
+        function updatePrizesDisplay() {
+            const remaining = state.totalPrizes - state.currentPrizeIndex;
+            document.getElementById('prizesLeft').textContent = remaining;
+        }
+
+        function isWithinTimeRange() {
+            const now = new Date();
+            const hour = now.getHours();
+            return hour >= 7 && hour < 20;
+        }
+
+        function shouldWin() {
+            if (state.currentPrizeIndex >= state.prizes.length) {
+                return false;
+            }
+            
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const nextPrizeTime = state.prizes[state.currentPrizeIndex];
+            
+            return currentTime >= nextPrizeTime;
+        }
+
+        function spin() {
+            if (state.isSpinning) return;
+            
+            if (!isWithinTimeRange()) {
+                document.getElementById('result').className = 'result lose';
+                document.getElementById('result').textContent = '⏰ Le tirage est disponible uniquement entre 7h et 20h !';
+                return;
+            }
+
+            if (state.currentPrizeIndex >= state.totalPrizes) {
+                document.getElementById('result').className = 'result lose';
+                document.getElementById('result').textContent = '😔 Tous les cadeaux ont été distribués aujourd\'hui !';
+                return;
+            }
+
+            state.isSpinning = true;
+            document.getElementById('spinButton').disabled = true;
+            document.getElementById('result').textContent = '';
+            document.getElementById('result').className = 'result';
+
+            const wheel = document.getElementById('wheel');
+            const isWinner = shouldWin();
+            
+            const baseRotation = 1800;
+            let finalRotation;
+            
+            if (isWinner) {
+                finalRotation = baseRotation + 0;
+            } else {
+                const loseAngles = [180, 36, 72, 108, 144, 216, 252, 288, 324];
+                const randomLoseAngle = loseAngles[Math.floor(Math.random() * loseAngles.length)];
+                finalRotation = baseRotation + randomLoseAngle;
+            }
+
+            wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+            setTimeout(() => {
+                state.isSpinning = false;
+                document.getElementById('spinButton').disabled = false;
+
+                const resultDiv = document.getElementById('result');
+                
+                if (isWinner) {
+                    state.currentPrizeIndex++;
+                    saveState();
+                    updatePrizesDisplay();
+                    
+                    resultDiv.className = 'result win celebrate';
+                    resultDiv.textContent = '🎉 FÉLICITATIONS ! Vous avez gagné un grille-pain ! 🎉';
+                } else {
+                    resultDiv.className = 'result lose';
+                    resultDiv.textContent = '😔 Dommage ! Réessayez plus tard !';
+                }
+            }, 4000);
+        }
+
+        window.onload = initializePrizes;
+    </script>
+</body>
+</html>
