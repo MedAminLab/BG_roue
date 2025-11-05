@@ -11,37 +11,101 @@
             box-sizing: border-box;
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background: #f5f5dc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #d4a574 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 200, 100, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f00;
+            z-index: 1000;
+            animation: confetti 3s ease-out forwards;
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
             padding: clamp(20px, 5vw, 40px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.2),
+                0 0 0 1px rgba(255,255,255,0.5) inset;
             max-width: 600px;
             width: 95%;
             text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.6s ease-out;
+            backdrop-filter: blur(10px);
         }
 
         h1 {
-            color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 10px;
-            font-size: clamp(1.5em, 5vw, 2.5em);
+            font-size: clamp(1.8em, 5vw, 2.8em);
+            font-weight: 800;
+            animation: float 3s ease-in-out infinite;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .subtitle {
             color: #666;
             margin-bottom: 30px;
-            font-size: clamp(0.9em, 3vw, 1.1em);
+            font-size: clamp(0.9em, 3vw, 1.2em);
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out 0.3s forwards;
         }
 
         .wheel-container {
@@ -49,6 +113,7 @@
             width: min(400px, 85vw);
             height: min(400px, 85vw);
             margin: 30px auto;
+            animation: fadeIn 0.6s ease-out 0.6s both;
         }
 
         .wheel {
@@ -65,10 +130,28 @@
                 #4ecdc4 180deg 270deg,
                 #ff6b6b 270deg 360deg
             );
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.3),
+                0 0 0 5px rgba(255,255,255,0.2),
+                inset 0 0 30px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .wheel::before {
+            content: '';
+            position: absolute;
+            inset: -15px;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+            animation: shimmer 3s linear infinite;
+            background-size: 200% 200%;
         }
 
         .wheel-text {
@@ -78,7 +161,9 @@
             font-size: clamp(1em, 3.5vw, 1.5em);
             font-weight: bold;
             color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.5),
+                0 0 10px rgba(0,0,0,0.3);
         }
 
         .wheel-text span {
@@ -109,12 +194,15 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: min(60px, 15vw);
-            height: min(60px, 15vw);
-            background: #333;
+            width: min(70px, 17vw);
+            height: min(70px, 17vw);
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
             border-radius: 50%;
             border: 5px solid white;
             z-index: 10;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.4),
+                inset 0 2px 5px rgba(255,255,255,0.2);
         }
 
         .pointer {
@@ -128,7 +216,8 @@
             border-right: clamp(15px, 4vw, 20px) solid transparent;
             border-top: clamp(30px, 8vw, 40px) solid #ff6b6b;
             z-index: 5;
-            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .spin-button {
@@ -140,26 +229,55 @@
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 
+                0 8px 20px rgba(102, 126, 234, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.2);
             margin-top: 20px;
             width: auto;
             max-width: 90%;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spin-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .spin-button:hover:not(:disabled)::before {
+            left: 100%;
         }
 
         .spin-button:hover:not(:disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            box-shadow: 
+                0 12px 30px rgba(102, 126, 234, 0.5),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .spin-button:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .spin-button:disabled {
-            background: #ccc;
+            background: linear-gradient(135deg, #ccc 0%, #999 100%);
             cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .result {
             margin-top: 30px;
             padding: clamp(15px, 3vw, 20px);
-            border-radius: 10px;
+            border-radius: 15px;
             font-size: clamp(1em, 3vw, 1.3em);
             font-weight: bold;
             min-height: 60px;
@@ -167,51 +285,40 @@
             align-items: center;
             justify-content: center;
             text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.3s ease-out;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: scale(1);
         }
 
         .result.win {
-            background: #d4edda;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
             color: #155724;
             border: 2px solid #c3e6cb;
+            box-shadow: 0 5px 20px rgba(21, 87, 36, 0.2);
         }
 
         .result.lose {
-            background: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             color: #721c24;
             border: 2px solid #f5c6cb;
-        }
-
-        .info {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e7f3ff;
-            border-radius: 10px;
-            color: #004085;
-        }
-
-        .prizes-left {
-            margin-top: 15px;
-            font-size: 1.1em;
-            color: #333;
-        }
-
-        @keyframes celebration {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .celebrate {
-            animation: celebration 0.5s ease-in-out 3;
+            box-shadow: 0 5px 20px rgba(114, 28, 36, 0.2);
         }
 
         .stock-counter {
             margin-top: 30px;
             padding: 20px;
-            background: #fff3cd;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
             border: 2px solid #ffc107;
-            border-radius: 10px;
+            border-radius: 15px;
             font-size: 1.2em;
             color: #856404;
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+            transition: all 0.3s;
         }
 
         .stock-counter strong {
@@ -220,7 +327,7 @@
         }
 
         .stock-empty {
-            background: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             border-color: #f5c6cb;
             color: #721c24;
         }
@@ -232,12 +339,33 @@
         .last-winner {
             margin-top: 15px;
             padding: 15px;
-            background: #d1ecf1;
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
             border: 2px solid #bee5eb;
-            border-radius: 10px;
+            border-radius: 15px;
             font-size: 1.1em;
             color: #0c5460;
             display: none;
+            box-shadow: 0 5px 15px rgba(12, 84, 96, 0.2);
+        }
+
+        @keyframes celebration {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .celebrate {
+            animation: celebration 0.5s ease-in-out 3;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -245,7 +373,7 @@
     <div class="container">
         <h1>🎰 Roue de la Chance 🎰</h1>
         <p class="subtitle">Tentez de gagner un grille-pain !</p>
-        
+
         <div class="wheel-container">
             <div class="pointer"></div>
             <div class="wheel" id="wheel">
@@ -282,76 +410,34 @@
             lastWinner: null
         };
 
-        async function initializeState() {
-            try {
-                // Charger l'état partagé depuis le stockage persistant
-                const result = await window.storage.get('wheelGameState', true);
+        function initializeState() {
+            const stored = localStorage.getItem('wheelGameState');
+            if (stored) {
+                const data = JSON.parse(stored);
+                const now = new Date();
+                const storedDate = new Date(data.date);
                 
-                if (result && result.value) {
-                    const data = JSON.parse(result.value);
-                    const now = new Date();
-                    const storedDate = new Date(data.date);
-                    
-                    // Vérifier si c'est le même jour
-                    if (now.toDateString() === storedDate.toDateString()) {
-                        state.winnersCount = data.winnersCount || 0;
-                        state.lastWinner = data.lastWinner || null;
-                    } else {
-                        // Nouveau jour, réinitialiser
-                        state.winnersCount = 0;
-                        state.lastWinner = null;
-                        await saveState();
-                    }
+                if (now.toDateString() === storedDate.toDateString()) {
+                    state.winnersCount = data.winnersCount || 0;
+                    state.lastWinner = data.lastWinner || null;
                 } else {
-                    // Première initialisation
-                    await saveState();
+                    state.winnersCount = 0;
+                    state.lastWinner = null;
+                    saveState();
                 }
-            } catch (error) {
-                console.log('Première initialisation du jeu');
-                state.winnersCount = 0;
-                state.lastWinner = null;
-                await saveState();
             }
-            
             updateStockDisplay();
             displayLastWinner();
         }
 
-        async function saveState() {
+        function saveState() {
             const now = new Date();
             const data = {
                 date: now.toISOString(),
                 winnersCount: state.winnersCount,
                 lastWinner: state.lastWinner
             };
-            
-            try {
-                await window.storage.set('wheelGameState', JSON.stringify(data), true);
-            } catch (error) {
-                console.error('Erreur de sauvegarde:', error);
-            }
-        }
-
-        async function refreshStock() {
-            // Recharger le stock depuis le serveur pour avoir les données à jour
-            try {
-                const result = await window.storage.get('wheelGameState', true);
-                if (result && result.value) {
-                    const data = JSON.parse(result.value);
-                    const now = new Date();
-                    const storedDate = new Date(data.date);
-                    
-                    if (now.toDateString() === storedDate.toDateString()) {
-                        state.winnersCount = data.winnersCount || 0;
-                        state.lastWinner = data.lastWinner || null;
-                    }
-                }
-            } catch (error) {
-                console.log('Erreur lors du rafraîchissement');
-            }
-            
-            updateStockDisplay();
-            displayLastWinner();
+            localStorage.setItem('wheelGameState', JSON.stringify(data));
         }
 
         function updateStockDisplay() {
@@ -365,7 +451,7 @@
                 stockCounter.className = 'stock-counter stock-empty';
                 stockCounter.innerHTML = '❌ <strong>Stock épuisé</strong> - Tous les grille-pains ont été gagnés aujourd\'hui !';
             } else if (remaining <= 3) {
-                stockCounter.style.background = '#fff3cd';
+                stockCounter.style.background = 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)';
                 stockCounter.innerHTML = `⚠️ Plus que <strong>${remaining}</strong> grille-pain${remaining > 1 ? 's' : ''} disponible${remaining > 1 ? 's' : ''} !`;
             } else {
                 stockCounter.innerHTML = `📦 Stock disponible : <strong>${remaining}</strong> grille-pains`;
@@ -384,6 +470,23 @@
             }
         }
 
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8787', '#74b9ff'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
         function isWithinTimeRange() {
             const now = new Date();
             const hour = now.getHours();
@@ -391,37 +494,34 @@
         }
 
         function shouldWin() {
-            // Vérifier s'il reste des cadeaux
             if (state.winnersCount >= state.totalPrizes) {
                 return false;
             }
-            
-            // Probabilité de gain : 30% de chance
             return Math.random() < 0.30;
         }
 
-        async function spin() {
+        function spin() {
             if (state.isSpinning) return;
             
-            // Rafraîchir le stock avant de jouer
-            await refreshStock();
-            
             if (!isWithinTimeRange()) {
-                document.getElementById('result').className = 'result lose';
-                document.getElementById('result').textContent = '⏰ Le tirage est disponible uniquement entre 7h et 20h !';
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'result lose show';
+                resultDiv.textContent = '⏰ Le tirage est disponible uniquement entre 7h et 20h !';
                 return;
             }
 
             if (state.winnersCount >= state.totalPrizes) {
-                document.getElementById('result').className = 'result lose';
-                document.getElementById('result').textContent = '😔 Désolé, tous les grille-pains ont déjà été gagnés aujourd\'hui !';
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'result lose show';
+                resultDiv.textContent = '😔 Désolé, tous les grille-pains ont déjà été gagnés aujourd\'hui !';
                 return;
             }
 
             state.isSpinning = true;
             document.getElementById('spinButton').disabled = true;
-            document.getElementById('result').textContent = '';
-            document.getElementById('result').className = 'result';
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result';
+            resultDiv.textContent = '';
 
             const wheel = document.getElementById('wheel');
             const isWinner = shouldWin();
@@ -442,32 +542,28 @@
 
             wheel.style.transform = `rotate(${finalRotation}deg)`;
 
-            setTimeout(async () => {
+            setTimeout(() => {
                 state.isSpinning = false;
                 document.getElementById('spinButton').disabled = false;
-
-                const resultDiv = document.getElementById('result');
                 
                 if (isWinner) {
                     state.winnersCount++;
                     state.lastWinner = {
                         time: new Date().toISOString()
                     };
-                    await saveState();
+                    saveState();
                     updateStockDisplay();
                     displayLastWinner();
                     
-                    resultDiv.className = 'result win celebrate';
+                    createConfetti();
+                    resultDiv.className = 'result win celebrate show';
                     resultDiv.textContent = '🎉 FÉLICITATIONS ! Vous avez gagné un grille-pain ! 🎉';
                 } else {
-                    resultDiv.className = 'result lose';
+                    resultDiv.className = 'result lose show';
                     resultDiv.textContent = '😔 Dommage ! Réessayez votre chance !';
                 }
             }, 4000);
         }
-
-        // Rafraîchir le stock toutes les 10 secondes
-        setInterval(refreshStock, 10000);
 
         window.onload = initializeState;
     </script>
