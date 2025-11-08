@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roue de la Chance - Gagnez un Grille-Pain !</title>
+    <title>🎰 Tentez votre chance !</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,34 +12,52 @@
             box-sizing: border-box;
         }
 
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
         }
 
         @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.08); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes confetti {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(720deg) scale(0); opacity: 0; }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
+            50% { filter: drop-shadow(0 0 20px currentColor); }
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5e6d3 0%, #d4a574 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -52,118 +71,195 @@
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 200, 100, 0.1) 0%, transparent 50%);
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            animation: float 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .sparkles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
             z-index: 0;
         }
 
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
         .confetti {
             position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #f00;
+            width: 12px;
+            height: 12px;
             z-index: 1000;
-            animation: confetti 3s ease-out forwards;
+            animation: confetti 4s ease-out forwards;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            padding: clamp(20px, 5vw, 40px);
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 40px;
+            padding: clamp(30px, 6vw, 50px);
             box-shadow: 
-                0 20px 60px rgba(0,0,0,0.2),
-                0 0 0 1px rgba(255,255,255,0.5) inset;
-            max-width: 600px;
+                0 30px 80px rgba(0,0,0,0.3),
+                0 0 0 1px rgba(255,255,255,0.2) inset,
+                0 0 100px rgba(255,255,255,0.1);
+            max-width: 650px;
             width: 95%;
             text-align: center;
             position: relative;
             z-index: 1;
-            animation: fadeIn 0.6s ease-out;
-            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 2px solid rgba(255,255,255,0.18);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 40px;
+            padding: 2px;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .header {
+            margin-bottom: 20px;
         }
 
         h1 {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
-            font-size: clamp(1.8em, 5vw, 2.8em);
+            font-size: clamp(2em, 6vw, 3.2em);
             font-weight: 800;
-            animation: float 3s ease-in-out infinite;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            animation: float 4s ease-in-out infinite;
+            letter-spacing: 2px;
         }
 
         .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: clamp(0.9em, 3vw, 1.2em);
-            opacity: 0;
-            animation: fadeIn 0.6s ease-out 0.3s forwards;
+            color: rgba(255,255,255,0.95);
+            font-size: clamp(1em, 3.5vw, 1.4em);
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        .prize-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: clamp(1em, 3vw, 1.2em);
+            font-weight: 700;
+            margin: 20px 0;
+            box-shadow: 
+                0 10px 30px rgba(255,215,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.6);
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .wheel-container {
             position: relative;
-            width: min(400px, 85vw);
-            height: min(400px, 85vw);
-            margin: 30px auto;
-            animation: fadeIn 0.6s ease-out 0.6s both;
+            width: min(420px, 88vw);
+            height: min(420px, 88vw);
+            margin: 40px auto;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.4));
+        }
+
+        .wheel-glow {
+            position: absolute;
+            inset: -30px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+            z-index: -1;
         }
 
         .wheel {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 15px solid #333;
+            border: 18px solid rgba(255,255,255,0.2);
             position: relative;
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
             background: conic-gradient(
                 from 0deg,
-                #4ecdc4 0deg 90deg,
-                #ff6b6b 90deg 180deg,
-                #4ecdc4 180deg 270deg,
-                #ff6b6b 270deg 360deg
+                #00d2ff 0deg 90deg,
+                #ff006e 90deg 180deg,
+                #00d2ff 180deg 270deg,
+                #ff006e 270deg 360deg
             );
             box-shadow: 
-                0 15px 40px rgba(0,0,0,0.3),
-                0 0 0 5px rgba(255,255,255,0.2),
-                inset 0 0 30px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+                0 20px 60px rgba(0,0,0,0.4),
+                inset 0 0 60px rgba(255,255,255,0.1),
+                0 0 0 8px rgba(255,255,255,0.1);
         }
 
         .wheel::before {
             content: '';
             position: absolute;
-            inset: -15px;
+            inset: -18px;
             border-radius: 50%;
-            padding: 2px;
+            padding: 3px;
             background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
-            opacity: 0.5;
-            animation: shimmer 3s linear infinite;
-            background-size: 200% 200%;
+            animation: shimmer 2s linear infinite;
+            background-size: 300% 300%;
+        }
+
+        .wheel::after {
+            content: '';
+            position: absolute;
+            inset: -25px;
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 60%, rgba(255,255,255,0.1) 100%);
+        }
+
+        .wheel-segments {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            overflow: hidden;
         }
 
         .wheel-text {
             position: absolute;
             width: 100%;
             height: 100%;
-            font-size: clamp(1em, 3.5vw, 1.5em);
-            font-weight: bold;
+            font-size: clamp(1.2em, 4vw, 1.8em);
+            font-weight: 800;
             color: white;
             text-shadow: 
-                2px 2px 4px rgba(0,0,0,0.5),
-                0 0 10px rgba(0,0,0,0.3);
+                3px 3px 6px rgba(0,0,0,0.6),
+                0 0 20px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
         }
 
         .wheel-text span {
@@ -174,19 +270,19 @@
         }
 
         .wheel-text span:nth-child(1) {
-            transform: translate(-50%, -50%) rotate(-45deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(45deg);
+            transform: translate(-50%, -50%) rotate(-45deg) translateY(calc(min(420px, 88vw) * -0.32)) rotate(45deg);
         }
 
         .wheel-text span:nth-child(2) {
-            transform: translate(-50%, -50%) rotate(45deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(-45deg);
+            transform: translate(-50%, -50%) rotate(45deg) translateY(calc(min(420px, 88vw) * -0.32)) rotate(-45deg);
         }
 
         .wheel-text span:nth-child(3) {
-            transform: translate(-50%, -50%) rotate(135deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(-135deg);
+            transform: translate(-50%, -50%) rotate(135deg) translateY(calc(min(420px, 88vw) * -0.32)) rotate(-135deg);
         }
 
         .wheel-text span:nth-child(4) {
-            transform: translate(-50%, -50%) rotate(225deg) translateY(calc(min(400px, 85vw) * -0.325)) rotate(-225deg);
+            transform: translate(-50%, -50%) rotate(225deg) translateY(calc(min(420px, 88vw) * -0.32)) rotate(-225deg);
         }
 
         .wheel-center {
@@ -194,52 +290,53 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: min(70px, 17vw);
-            height: min(70px, 17vw);
-            background: linear-gradient(135deg, #2c3e50, #1a252f);
+            width: min(80px, 19vw);
+            height: min(80px, 19vw);
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
             border-radius: 50%;
-            border: 5px solid white;
+            border: 6px solid rgba(255,255,255,0.3);
             z-index: 10;
             box-shadow: 
-                0 5px 15px rgba(0,0,0,0.4),
-                inset 0 2px 5px rgba(255,255,255,0.2);
+                0 8px 25px rgba(0,0,0,0.5),
+                inset 0 2px 8px rgba(255,255,255,0.2);
         }
 
         .pointer {
             position: absolute;
-            top: -20px;
+            top: -25px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: clamp(15px, 4vw, 20px) solid transparent;
-            border-right: clamp(15px, 4vw, 20px) solid transparent;
-            border-top: clamp(30px, 8vw, 40px) solid #ff6b6b;
-            z-index: 5;
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
-            animation: pulse 2s ease-in-out infinite;
+            border-left: clamp(18px, 5vw, 25px) solid transparent;
+            border-right: clamp(18px, 5vw, 25px) solid transparent;
+            border-top: clamp(40px, 10vw, 50px) solid #ff006e;
+            z-index: 15;
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.5));
+            animation: neonPulse 2s ease-in-out infinite;
         }
 
         .spin-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: clamp(15px, 3vw, 20px) clamp(30px, 8vw, 50px);
-            font-size: clamp(1.1em, 3.5vw, 1.5em);
-            border-radius: 50px;
+            padding: clamp(18px, 4vw, 25px) clamp(40px, 10vw, 60px);
+            font-size: clamp(1.2em, 4vw, 1.8em);
+            border-radius: 60px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 
-                0 8px 20px rgba(102, 126, 234, 0.4),
-                inset 0 1px 0 rgba(255,255,255,0.2);
-            margin-top: 20px;
+                0 15px 35px rgba(102, 126, 234, 0.5),
+                inset 0 2px 0 rgba(255,255,255,0.3);
+            margin-top: 30px;
             width: auto;
             max-width: 90%;
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             position: relative;
             overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
         }
 
         .spin-button::before {
@@ -249,45 +346,42 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .spin-button:hover:not(:disabled)::before {
-            left: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s linear infinite;
         }
 
         .spin-button:hover:not(:disabled) {
-            transform: translateY(-3px);
+            transform: translateY(-5px) scale(1.05);
             box-shadow: 
-                0 12px 30px rgba(102, 126, 234, 0.5),
-                inset 0 1px 0 rgba(255,255,255,0.2);
+                0 20px 50px rgba(102, 126, 234, 0.6),
+                inset 0 2px 0 rgba(255,255,255,0.3);
         }
 
         .spin-button:active:not(:disabled) {
-            transform: translateY(-1px);
+            transform: translateY(-2px) scale(1.02);
         }
 
         .spin-button:disabled {
-            background: linear-gradient(135deg, #ccc 0%, #999 100%);
+            background: linear-gradient(135deg, #888 0%, #666 100%);
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.5;
+            transform: none;
         }
 
         .result {
-            margin-top: 30px;
-            padding: clamp(15px, 3vw, 20px);
-            border-radius: 15px;
-            font-size: clamp(1em, 3vw, 1.3em);
-            font-weight: bold;
-            min-height: 60px;
+            margin-top: 35px;
+            padding: clamp(20px, 4vw, 28px);
+            border-radius: 25px;
+            font-size: clamp(1.1em, 3.5vw, 1.5em);
+            font-weight: 700;
+            min-height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             opacity: 0;
-            transform: scale(0.9);
-            transition: all 0.3s ease-out;
+            transform: scale(0.8);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .result.show {
@@ -296,91 +390,104 @@
         }
 
         .result.win {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
-            border: 2px solid #c3e6cb;
-            box-shadow: 0 5px 20px rgba(21, 87, 36, 0.2);
+            background: linear-gradient(135deg, #00f260 0%, #0575e6 100%);
+            color: white;
+            box-shadow: 
+                0 15px 40px rgba(0,242,96,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.3);
         }
 
         .result.lose {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            color: #721c24;
-            border: 2px solid #f5c6cb;
-            box-shadow: 0 5px 20px rgba(114, 28, 36, 0.2);
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .stock-counter {
-            margin-top: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border: 2px solid #ffc107;
-            border-radius: 15px;
-            font-size: 1.2em;
-            color: #856404;
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
-            transition: all 0.3s;
+            margin-top: 35px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.2) 100%);
+            border: 2px solid rgba(255,215,0,0.5);
+            border-radius: 25px;
+            font-size: clamp(1em, 3vw, 1.3em);
+            color: white;
+            font-weight: 600;
+            box-shadow: 
+                0 10px 30px rgba(255,193,7,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
         }
 
         .stock-counter strong {
-            color: #d39e00;
-            font-size: 1.4em;
+            color: #ffd700;
+            font-size: 1.5em;
+            text-shadow: 0 2px 10px rgba(255,215,0,0.5);
         }
 
         .stock-empty {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            border-color: #f5c6cb;
-            color: #721c24;
+            background: linear-gradient(135deg, rgba(255,0,110,0.3) 0%, rgba(255,0,80,0.2) 100%);
+            border-color: rgba(255,0,110,0.5);
         }
 
         .stock-empty strong {
-            color: #721c24;
+            color: #ff006e;
         }
 
         .last-winner {
-            margin-top: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
-            border: 2px solid #bee5eb;
-            border-radius: 15px;
-            font-size: 1.1em;
-            color: #0c5460;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0,210,255,0.3) 0%, rgba(35,166,213,0.2) 100%);
+            border: 2px solid rgba(0,210,255,0.5);
+            border-radius: 25px;
+            font-size: clamp(1em, 3vw, 1.2em);
+            color: white;
             display: none;
-            box-shadow: 0 5px 15px rgba(12, 84, 96, 0.2);
+            font-weight: 600;
+            box-shadow: 
+                0 10px 30px rgba(0,210,255,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
         }
 
         @keyframes celebration {
             0%, 100% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.1) rotate(-5deg); }
-            75% { transform: scale(1.1) rotate(5deg); }
+            25% { transform: scale(1.15) rotate(-8deg); }
+            75% { transform: scale(1.15) rotate(8deg); }
         }
 
         .celebrate {
-            animation: celebration 0.5s ease-in-out 3;
+            animation: celebration 0.6s ease-in-out 4;
         }
 
         .loading {
-            color: #667eea;
-            font-size: 0.9em;
-            margin-top: 10px;
+            color: white;
+            font-size: 1em;
+            font-weight: 600;
         }
 
         @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8em;
-            }
-            
             .container {
-                padding: 20px;
+                padding: 25px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="sparkles" id="sparkles"></div>
+
     <div class="container">
-        <h1>🎰 Roue de la Chance 🎰</h1>
-        <p class="subtitle">Tentez de gagner un grille-pain !</p>
+        <div class="header">
+            <h1>🎰 ROUE DE LA CHANCE 🎰</h1>
+            <p class="subtitle">Tournez et gagnez !</p>
+            <div class="prize-badge">
+                🔥 10 GRILLE-PAINS À GAGNER 🔥
+            </div>
+        </div>
 
         <div class="wheel-container">
+            <div class="wheel-glow"></div>
             <div class="pointer"></div>
             <div class="wheel" id="wheel">
                 <div class="wheel-text">
@@ -394,21 +501,20 @@
         </div>
 
         <button class="spin-button" id="spinButton" onclick="spin()">
-            TOURNER LA ROUE
+            ✨ TOURNER ✨
         </button>
 
         <div class="result" id="result"></div>
 
         <div class="stock-counter" id="stockCounter">
-            <div class="loading">⏳ Chargement...</div>
+            <div class="loading">⏳ Chargement du stock...</div>
         </div>
 
         <div class="last-winner" id="lastWinner">
-            🎉 Dernier gagnant à --:--
+            🏆 Dernier gagnant à --:--
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -434,7 +540,23 @@
             lastWinner: null
         };
 
+        // Créer des étoiles scintillantes
+        function createSparkles() {
+            const sparklesContainer = document.getElementById('sparkles');
+            for (let i = 0; i < 30; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                sparkle.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                sparklesContainer.appendChild(sparkle);
+            }
+        }
+
         async function initializeState() {
+            createSparkles();
+            
             try {
                 const snapshot = await get(gameStateRef);
                 
@@ -507,14 +629,13 @@
             
             if (remaining === 0) {
                 stockCounter.className = 'stock-counter stock-empty';
-                stockCounter.innerHTML = '❌ <strong>Stock épuisé</strong> - Tous les grille-pains ont été gagnés aujourd\'hui !';
+                stockCounter.innerHTML = '❌ <strong>STOCK ÉPUISÉ</strong><br>Revenez demain !';
             } else if (remaining <= 3) {
                 stockCounter.className = 'stock-counter';
-                stockCounter.style.background = 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)';
-                stockCounter.innerHTML = `⚠️ Plus que <strong>${remaining}</strong> grille-pain${remaining > 1 ? 's' : ''} disponible${remaining > 1 ? 's' : ''} !`;
+                stockCounter.innerHTML = `⚠️ DÉPÊCHEZ-VOUS !<br>Plus que <strong>${remaining}</strong> restant${remaining > 1 ? 's' : ''} !`;
             } else {
                 stockCounter.className = 'stock-counter';
-                stockCounter.innerHTML = `📦 Stock disponible : <strong>${remaining}</strong> grille-pains`;
+                stockCounter.innerHTML = `📦 Stock disponible<br><strong>${remaining}</strong> / ${state.totalPrizes} grille-pains`;
             }
         }
 
@@ -523,7 +644,7 @@
             if (state.lastWinner) {
                 const winTime = new Date(state.lastWinner.time);
                 const timeStr = winTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-                winnerDiv.textContent = `🎉 Dernier gagnant à ${timeStr}`;
+                winnerDiv.innerHTML = `🏆 <strong>Dernier gagnant</strong> à ${timeStr}`;
                 winnerDiv.style.display = 'block';
             } else {
                 winnerDiv.style.display = 'none';
@@ -531,19 +652,23 @@
         }
 
         function createConfetti() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8787', '#74b9ff'];
-            for (let i = 0; i < 50; i++) {
+            const colors = ['#ff006e', '#00d2ff', '#ffd700', '#00f260', '#ff6b6b', '#4ecdc4'];
+            const shapes = ['○', '●', '◆', '■', '★', '▲'];
+            
+            for (let i = 0; i < 80; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
+                    confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
                     confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
-                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                    confetti.style.animationDelay = Math.random() * 0.3 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
                     document.body.appendChild(confetti);
                     
-                    setTimeout(() => confetti.remove(), 3000);
-                }, i * 30);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 20);
             }
         }
 
@@ -566,14 +691,14 @@
             if (!isWithinTimeRange()) {
                 const resultDiv = document.getElementById('result');
                 resultDiv.className = 'result lose show';
-                resultDiv.textContent = '⏰ Le tirage est disponible uniquement entre 7h et 20h !';
+                resultDiv.innerHTML = '⏰ <strong>Horaires :</strong><br>7h à 20h uniquement !';
                 return;
             }
 
             if (state.winnersCount >= state.totalPrizes) {
                 const resultDiv = document.getElementById('result');
                 resultDiv.className = 'result lose show';
-                resultDiv.textContent = '😔 Désolé, tous les grille-pains ont déjà été gagnés aujourd\'hui !';
+                resultDiv.innerHTML = '😔 <strong>Stock épuisé !</strong><br>Revenez demain !';
                 return;
             }
 
@@ -586,7 +711,7 @@
             const wheel = document.getElementById('wheel');
             const isWinner = shouldWin();
             
-            const spins = 5;
+            const spins = 6;
             const baseRotation = 360 * spins;
             let finalRotation;
             
@@ -615,15 +740,7 @@
                     
                     createConfetti();
                     resultDiv.className = 'result win celebrate show';
-                    resultDiv.textContent = '🎉 FÉLICITATIONS ! Vous avez gagné un grille-pain ! 🎉';
+                    resultDiv.innerHTML = '🎉 <strong>FÉLICITATIONS !</strong><br>Vous avez gagné un grille-pain ! 🎉';
                 } else {
                     resultDiv.className = 'result lose show';
-                    resultDiv.textContent = '😔 Dommage ! Réessayez votre chance !';
-                }
-            }, 4000);
-        };
-
-        window.onload = initializeState;
-    </script>
-</body>
-</html>
+                    resultDiv.innerHTML = '😔 <strong>Dommage...</strong><br>Retentez votre chance !';
