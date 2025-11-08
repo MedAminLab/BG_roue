@@ -59,6 +59,23 @@
             75% { transform: scale(1.1) rotate(5deg); }
         }
 
+        @keyframes firework {
+            0% { transform: translate(var(--x), var(--y)) scale(0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(1); opacity: 0; }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.5); }
+            50% { box-shadow: 0 0 40px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.6); }
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
@@ -115,6 +132,15 @@
             animation: confetti 4s ease-out forwards;
         }
 
+        .firework {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            z-index: 1001;
+            animation: firework 1s ease-out forwards;
+        }
+
         .container {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(15px) saturate(180%);
@@ -149,6 +175,7 @@
 
         .header {
             margin-bottom: 15px;
+            position: relative;
         }
 
         h1 {
@@ -375,11 +402,11 @@
 
         .result {
             margin-top: 25px;
-            padding: 18px;
+            padding: 20px;
             border-radius: 20px;
             font-size: 1.2rem;
             font-weight: 700;
-            min-height: 60px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -387,58 +414,76 @@
             opacity: 0;
             transform: scale(0.9);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            line-height: 1.4;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .result.show {
             opacity: 1;
             transform: scale(1);
+            animation: bounceIn 0.6s ease-out;
         }
 
         .result.win {
             background: linear-gradient(135deg, #00f260 0%, #0575e6 100%);
             color: white;
             box-shadow: 
-                0 12px 30px rgba(0,242,96,0.4),
+                0 15px 40px rgba(0,242,96,0.5),
                 inset 0 1px 0 rgba(255,255,255,0.3);
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.4);
+            animation: glow 2s ease-in-out infinite;
         }
 
         .result.lose {
-            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .result-icon {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .result-message {
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
         .stock-counter {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 10px 16px;
-            background: linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.2) 100%);
-            border: 1px solid rgba(255,215,0,0.5);
+            top: 20px;
+            right: 20px;
+            padding: 12px 18px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.4) 0%, rgba(255,193,7,0.3) 100%);
+            border: 2px solid rgba(255,215,0,0.6);
             border-radius: 40px;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: #ffd700;
             font-weight: 800;
             box-shadow: 
-                0 4px 15px rgba(255,193,7,0.3),
-                inset 0 1px 0 rgba(255,255,255,0.2);
+                0 6px 20px rgba(255,193,7,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
             backdrop-filter: blur(10px);
-            min-width: 50px;
+            min-width: 60px;
             text-align: center;
+            z-index: 10;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .stock-counter strong {
             color: #ffd700;
-            font-size: 1rem;
-            text-shadow: 0 2px 8px rgba(255,215,0,0.5);
+            font-size: 1.3rem;
+            text-shadow: 0 2px 10px rgba(255,215,0,0.6);
         }
 
         .stock-empty {
-            background: linear-gradient(135deg, rgba(255,0,110,0.3) 0%, rgba(255,0,80,0.2) 100%);
-            border-color: rgba(255,0,110,0.5);
+            background: linear-gradient(135deg, rgba(255,0,110,0.4) 0%, rgba(255,0,80,0.3) 100%);
+            border-color: rgba(255,0,110,0.6);
             color: #ff006e;
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
         .stock-empty strong {
@@ -469,6 +514,18 @@
             color: white;
             font-size: 0.9rem;
             font-weight: 600;
+        }
+
+        .winning-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(255,215,0,0.1) 70%);
+            animation: glow 2s ease-in-out;
+            pointer-events: none;
+            z-index: 999;
         }
 
         /* Responsive pour très petits écrans */
@@ -526,9 +583,13 @@
             }
             
             .stock-counter {
-                top: 10px;
-                right: 10px;
-                padding: 8px 12px;
+                top: 15px;
+                right: 15px;
+                padding: 10px 15px;
+                font-size: 1.2rem;
+            }
+            
+            .stock-counter strong {
                 font-size: 1.1rem;
             }
         }
@@ -559,6 +620,11 @@
             
             .wheel-text span:nth-child(4) {
                 transform: translate(-50%, -50%) rotate(225deg) translateY(-105px) rotate(-225deg);
+            }
+            
+            .stock-counter {
+                top: 25px;
+                right: 25px;
             }
         }
     </style>
@@ -741,21 +807,58 @@
             const colors = ['#ff006e', '#00d2ff', '#ffd700', '#00f260', '#ff6b6b', '#4ecdc4'];
             const shapes = ['○', '●', '◆', '■', '★', '▲'];
             
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 80; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
                     confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
                     confetti.style.left = Math.random() * 100 + 'vw';
                     confetti.style.color = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.fontSize = (Math.random() * 15 + 10) + 'px';
-                    confetti.style.animationDelay = Math.random() * 0.3 + 's';
+                    confetti.style.fontSize = (Math.random() * 15 + 12) + 'px';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
                     confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
                     document.body.appendChild(confetti);
                     
                     setTimeout(() => confetti.remove(), 4000);
-                }, i * 20);
+                }, i * 15);
             }
+        }
+
+        function createFireworks() {
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    const x = Math.random() * 80 + 10;
+                    const y = Math.random() * 80 + 10;
+                    firework.style.setProperty('--x', x + 'vw');
+                    firework.style.setProperty('--y', y + 'vh');
+                    firework.style.background = `radial-gradient(circle, 
+                        ${getRandomColor()} 0%, 
+                        ${getRandomColor()} 30%, 
+                        transparent 70%)`;
+                    firework.style.width = (Math.random() * 100 + 50) + 'px';
+                    firework.style.height = firework.style.width;
+                    document.body.appendChild(firework);
+                    
+                    setTimeout(() => firework.remove(), 1000);
+                }, i * 200);
+            }
+        }
+
+        function getRandomColor() {
+            const colors = ['#ff006e', '#00d2ff', '#ffd700', '#00f260', '#ff6b6b', '#4ecdc4', '#9d4edd', '#ff9100'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function createWinningGlow() {
+            const glow = document.createElement('div');
+            glow.className = 'winning-glow';
+            document.body.appendChild(glow);
+            
+            setTimeout(() => {
+                glow.remove();
+            }, 2000);
         }
 
         function isWithinTimeRange() {
@@ -777,14 +880,22 @@
             if (!isWithinTimeRange()) {
                 const resultDiv = document.getElementById('result');
                 resultDiv.className = 'result lose show';
-                resultDiv.innerHTML = '⏰ <strong>Horaires :</strong><br>7h à 20h uniquement !';
+                resultDiv.innerHTML = `
+                    <div class="result-icon">⏰</div>
+                    <div class="result-message">Hors horaires !</div>
+                    <div>7h à 20h uniquement</div>
+                `;
                 return;
             }
 
             if (state.winnersCount >= state.totalPrizes) {
                 const resultDiv = document.getElementById('result');
                 resultDiv.className = 'result lose show';
-                resultDiv.innerHTML = '😔 <strong>Stock épuisé !</strong><br>Revenez demain !';
+                resultDiv.innerHTML = `
+                    <div class="result-icon">😔</div>
+                    <div class="result-message">Stock épuisé !</div>
+                    <div>Revenez demain</div>
+                `;
                 return;
             }
 
@@ -824,12 +935,24 @@
                     };
                     await saveState();
                     
+                    // Effets de victoire
                     createConfetti();
+                    createFireworks();
+                    createWinningGlow();
+                    
                     resultDiv.className = 'result win celebrate show';
-                    resultDiv.innerHTML = '🎉 <strong>FÉLICITATIONS !</strong><br>Vous avez gagné un grille-pain ! 🎉';
+                    resultDiv.innerHTML = `
+                        <div class="result-icon">🎉</div>
+                        <div class="result-message">FÉLICITATIONS !</div>
+                        <div>Vous avez gagné un grille-pain !</div>
+                    `;
                 } else {
                     resultDiv.className = 'result lose show';
-                    resultDiv.innerHTML = '😔 <strong>Dommage...</strong><br>Retentez votre chance !';
+                    resultDiv.innerHTML = `
+                        <div class="result-icon">😔</div>
+                        <div class="result-message">Dommage...</div>
+                        <div>Retentez votre chance !</div>
+                    `;
                 }
             }, 4000);
         }
@@ -840,5 +963,4 @@
             document.getElementById('spinButton').addEventListener('click', spin);
         });
     </script>
-</body>
-</html>
+</
