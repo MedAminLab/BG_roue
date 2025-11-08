@@ -358,6 +358,12 @@
             animation: celebration 0.5s ease-in-out 3;
         }
 
+        .loading {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
         @media (max-width: 480px) {
             h1 {
                 font-size: 1.8em;
@@ -394,7 +400,7 @@
         <div class="result" id="result"></div>
 
         <div class="stock-counter" id="stockCounter">
-            📦 Stock disponible : <strong id="stockNumber">10</strong> grille-pains
+            <div class="loading">⏳ Chargement...</div>
         </div>
 
         <div class="last-winner" id="lastWinner">
@@ -402,7 +408,25 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqydbRduqfwgOdxDT9_trv_c16w4GpNeA",
+            authDomain: "roue-chance.firebaseapp.com",
+            databaseURL: "https://roue-chance-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "roue-chance",
+            storageBucket: "roue-chance.firebasestorage.app",
+            messagingSenderId: "853891277239",
+            appId: "1:853891277239:web:c244df63fab8a9dc138832"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const gameStateRef = ref(database, 'wheelGameState');
+
         const state = {
             winnersCount: 0,
             isSpinning: false,
@@ -410,50 +434,86 @@
             lastWinner: null
         };
 
-        function initializeState() {
-            const stored = localStorage.getItem('wheelGameState');
-            if (stored) {
-                const data = JSON.parse(stored);
-                const now = new Date();
-                const storedDate = new Date(data.date);
+        async function initializeState() {
+            try {
+                const snapshot = await get(gameStateRef);
                 
-                if (now.toDateString() === storedDate.toDateString()) {
-                    state.winnersCount = data.winnersCount || 0;
-                    state.lastWinner = data.lastWinner || null;
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const now = new Date();
+                    const storedDate = new Date(data.date);
+                    
+                    if (now.toDateString() === storedDate.toDateString()) {
+                        state.winnersCount = data.winnersCount || 0;
+                        state.lastWinner = data.lastWinner || null;
+                    } else {
+                        await resetDaily();
+                    }
                 } else {
-                    state.winnersCount = 0;
-                    state.lastWinner = null;
-                    saveState();
+                    await resetDaily();
                 }
+                
+                updateStockDisplay();
+                displayLastWinner();
+                
+                onValue(gameStateRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        const now = new Date();
+                        const storedDate = new Date(data.date);
+                        
+                        if (now.toDateString() === storedDate.toDateString()) {
+                            state.winnersCount = data.winnersCount || 0;
+                            state.lastWinner = data.lastWinner || null;
+                            updateStockDisplay();
+                            displayLastWinner();
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Erreur Firebase:', error);
+                document.getElementById('stockCounter').innerHTML = '⚠️ Erreur de connexion';
             }
-            updateStockDisplay();
-            displayLastWinner();
         }
 
-        function saveState() {
+        async function resetDaily() {
             const now = new Date();
-            const data = {
+            await set(gameStateRef, {
                 date: now.toISOString(),
-                winnersCount: state.winnersCount,
-                lastWinner: state.lastWinner
-            };
-            localStorage.setItem('wheelGameState', JSON.stringify(data));
+                winnersCount: 0,
+                lastWinner: null
+            });
+            state.winnersCount = 0;
+            state.lastWinner = null;
+        }
+
+        async function saveState() {
+            const now = new Date();
+            try {
+                await set(gameStateRef, {
+                    date: now.toISOString(),
+                    winnersCount: state.winnersCount,
+                    lastWinner: state.lastWinner
+                });
+            } catch (error) {
+                console.error('Erreur de sauvegarde:', error);
+            }
         }
 
         function updateStockDisplay() {
             const remaining = state.totalPrizes - state.winnersCount;
-            const stockNumber = document.getElementById('stockNumber');
             const stockCounter = document.getElementById('stockCounter');
-            
-            stockNumber.textContent = remaining;
             
             if (remaining === 0) {
                 stockCounter.className = 'stock-counter stock-empty';
                 stockCounter.innerHTML = '❌ <strong>Stock épuisé</strong> - Tous les grille-pains ont été gagnés aujourd\'hui !';
             } else if (remaining <= 3) {
+                stockCounter.className = 'stock-counter';
                 stockCounter.style.background = 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)';
                 stockCounter.innerHTML = `⚠️ Plus que <strong>${remaining}</strong> grille-pain${remaining > 1 ? 's' : ''} disponible${remaining > 1 ? 's' : ''} !`;
             } else {
+                stockCounter.className = 'stock-counter';
                 stockCounter.innerHTML = `📦 Stock disponible : <strong>${remaining}</strong> grille-pains`;
             }
         }
@@ -500,7 +560,7 @@
             return Math.random() < 0.30;
         }
 
-        function spin() {
+        window.spin = async function() {
             if (state.isSpinning) return;
             
             if (!isWithinTimeRange()) {
@@ -542,7 +602,7 @@
 
             wheel.style.transform = `rotate(${finalRotation}deg)`;
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 state.isSpinning = false;
                 document.getElementById('spinButton').disabled = false;
                 
@@ -551,9 +611,7 @@
                     state.lastWinner = {
                         time: new Date().toISOString()
                     };
-                    saveState();
-                    updateStockDisplay();
-                    displayLastWinner();
+                    await saveState();
                     
                     createConfetti();
                     resultDiv.className = 'result win celebrate show';
@@ -563,7 +621,7 @@
                     resultDiv.textContent = '😔 Dommage ! Réessayez votre chance !';
                 }
             }, 4000);
-        }
+        };
 
         window.onload = initializeState;
     </script>
