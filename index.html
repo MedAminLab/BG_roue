@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎰 Tentez votre chance !</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase App -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -736,11 +740,10 @@
             appId: "1:853891277239:web:c244df63fab8a9dc138832"
         };
 
-        // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const gameStateRef = database.ref('wheelGameState');
-
+        // Variables globales
+        let database;
+        let gameStateRef;
+        
         const state = {
             winnersCount: 0,
             isSpinning: false,
@@ -750,6 +753,22 @@
             countdownTimer: null,
             countdownValue: 10
         };
+
+        // Initialiser Firebase
+        function initializeFirebase() {
+            try {
+                // Initialiser Firebase avec la version compat
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                gameStateRef = database.ref('wheelGameState');
+                
+                console.log('Firebase initialisé avec succès');
+                initializeState();
+            } catch (error) {
+                console.error('Erreur Firebase:', error);
+                document.getElementById('stockCounter').innerHTML = '⚠️ Erreur Firebase';
+            }
+        }
 
         // Créer des étoiles scintillantes
         function createSparkles() {
@@ -788,27 +807,27 @@
                     
                     updateStockDisplay();
                     displayLastWinner();
+                    
+                    // Écouter les changements en temps réel
+                    gameStateRef.on('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            const now = new Date();
+                            const storedDate = new Date(data.date);
+                            
+                            if (now.toDateString() === storedDate.toDateString()) {
+                                state.winnersCount = data.winnersCount || 0;
+                                state.lastWinner = data.lastWinner || null;
+                                updateStockDisplay();
+                                displayLastWinner();
+                            }
+                        }
+                    });
                 })
                 .catch((error) => {
                     console.error('Erreur Firebase:', error);
                     document.getElementById('stockCounter').innerHTML = '⚠️ Erreur';
                 });
-
-            // Écouter les changements en temps réel
-            gameStateRef.on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const now = new Date();
-                    const storedDate = new Date(data.date);
-                    
-                    if (now.toDateString() === storedDate.toDateString()) {
-                        state.winnersCount = data.winnersCount || 0;
-                        state.lastWinner = data.lastWinner || null;
-                        updateStockDisplay();
-                        displayLastWinner();
-                    }
-                }
-            });
         }
 
         function resetDaily() {
@@ -1001,7 +1020,11 @@
                 finalRotation = baseRotation + randomLoseAngle;
             }
 
-            // Utiliser l'animation CSS pour la rotation
+            // Réinitialiser l'animation
+            wheel.classList.remove('spinning');
+            void wheel.offsetWidth; // Trigger reflow
+
+            // Appliquer la rotation avec animation CSS
             wheel.style.setProperty('--final-rotation', finalRotation + 'deg');
             wheel.classList.add('spinning');
 
@@ -1043,19 +1066,8 @@
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            // Charger Firebase depuis CDN
-            const script = document.createElement('script');
-            script.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
-            script.onload = function() {
-                const script2 = document.createElement('script');
-                script2.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js';
-                script2.onload = function() {
-                    initializeState();
-                    document.getElementById('spinButton').addEventListener('click', spin);
-                };
-                document.head.appendChild(script2);
-            };
-            document.head.appendChild(script);
+            initializeFirebase();
+            document.getElementById('spinButton').addEventListener('click', spin);
         });
     </script>
 </body>
