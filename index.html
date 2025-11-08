@@ -81,6 +81,11 @@
             100% { transform: scale(0.8); opacity: 0.7; }
         }
 
+        @keyframes wheelSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(var(--final-rotation)); }
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
@@ -262,7 +267,6 @@
             border-radius: 50%;
             border: 12px solid rgba(255,255,255,0.2);
             position: relative;
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
             background: conic-gradient(
                 from 0deg,
                 #00d2ff 0deg 90deg,
@@ -274,6 +278,12 @@
                 0 15px 40px rgba(0,0,0,0.4),
                 inset 0 0 40px rgba(255,255,255,0.1),
                 0 0 0 6px rgba(255,255,255,0.1);
+            transform: rotate(0deg);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+
+        .wheel.spinning {
+            animation: wheelSpin 4s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
         }
 
         .wheel::before {
@@ -714,10 +724,8 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
+    <script>
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBqydbRduqfwgOdxDT9_trv_c16w4GpNeA",
             authDomain: "roue-chance.firebaseapp.com",
@@ -728,15 +736,16 @@
             appId: "1:853891277239:web:c244df63fab8a9dc138832"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const gameStateRef = ref(database, 'wheelGameState');
+        // Initialiser Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const gameStateRef = database.ref('wheelGameState');
 
         const state = {
             winnersCount: 0,
             isSpinning: false,
-            totalPrizes: 10,           // 10 grille-pains
-            estimatedClients: 200,     // 200 clients estimés
+            totalPrizes: 10,
+            estimatedClients: 200,
             lastWinner: null,
             countdownTimer: null,
             countdownValue: 10
@@ -756,31 +765,12 @@
             }
         }
 
-        async function initializeState() {
+        // Initialiser l'état
+        function initializeState() {
             createSparkles();
             
-            try {
-                const snapshot = await get(gameStateRef);
-                
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const now = new Date();
-                    const storedDate = new Date(data.date);
-                    
-                    if (now.toDateString() === storedDate.toDateString()) {
-                        state.winnersCount = data.winnersCount || 0;
-                        state.lastWinner = data.lastWinner || null;
-                    } else {
-                        await resetDaily();
-                    }
-                } else {
-                    await resetDaily();
-                }
-                
-                updateStockDisplay();
-                displayLastWinner();
-                
-                onValue(gameStateRef, (snapshot) => {
+            gameStateRef.once('value')
+                .then((snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.val();
                         const now = new Date();
@@ -789,21 +779,41 @@
                         if (now.toDateString() === storedDate.toDateString()) {
                             state.winnersCount = data.winnersCount || 0;
                             state.lastWinner = data.lastWinner || null;
-                            updateStockDisplay();
-                            displayLastWinner();
+                        } else {
+                            resetDaily();
                         }
+                    } else {
+                        resetDaily();
                     }
+                    
+                    updateStockDisplay();
+                    displayLastWinner();
+                })
+                .catch((error) => {
+                    console.error('Erreur Firebase:', error);
+                    document.getElementById('stockCounter').innerHTML = '⚠️ Erreur';
                 });
-                
-            } catch (error) {
-                console.error('Erreur Firebase:', error);
-                document.getElementById('stockCounter').innerHTML = '⚠️ Erreur';
-            }
+
+            // Écouter les changements en temps réel
+            gameStateRef.on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const now = new Date();
+                    const storedDate = new Date(data.date);
+                    
+                    if (now.toDateString() === storedDate.toDateString()) {
+                        state.winnersCount = data.winnersCount || 0;
+                        state.lastWinner = data.lastWinner || null;
+                        updateStockDisplay();
+                        displayLastWinner();
+                    }
+                }
+            });
         }
 
-        async function resetDaily() {
+        function resetDaily() {
             const now = new Date();
-            await set(gameStateRef, {
+            gameStateRef.set({
                 date: now.toISOString(),
                 winnersCount: 0,
                 lastWinner: null
@@ -812,17 +822,15 @@
             state.lastWinner = null;
         }
 
-        async function saveState() {
+        function saveState() {
             const now = new Date();
-            try {
-                await set(gameStateRef, {
-                    date: now.toISOString(),
-                    winnersCount: state.winnersCount,
-                    lastWinner: state.lastWinner
-                });
-            } catch (error) {
+            gameStateRef.set({
+                date: now.toISOString(),
+                winnersCount: state.winnersCount,
+                lastWinner: state.lastWinner
+            }).catch((error) => {
                 console.error('Erreur de sauvegarde:', error);
-            }
+            });
         }
 
         function updateStockDisplay() {
@@ -911,17 +919,15 @@
         function isWithinTimeRange() {
             const now = new Date();
             const hour = now.getHours();
-            return hour >= 7 && hour < 20;  // 7h à 20h
+            return hour >= 7 && hour < 20;
         }
 
         function shouldWin() {
-            // Plus de stock = plus de gagnants
             if (state.winnersCount >= state.totalPrizes) {
                 return false;
             }
             
-            // Calcul de probabilité basé sur le ratio stock/clients
-            const winProbability = state.totalPrizes / state.estimatedClients; // 10/200 = 0.05 (5%)
+            const winProbability = state.totalPrizes / state.estimatedClients;
             return Math.random() < winProbability;
         }
 
@@ -929,7 +935,6 @@
             state.countdownValue = 10;
             const resultDiv = document.getElementById('result');
             
-            // Créer l'élément de compte à rebours
             let countdownElement = resultDiv.querySelector('.countdown');
             if (!countdownElement) {
                 countdownElement = document.createElement('div');
@@ -937,19 +942,18 @@
                 resultDiv.appendChild(countdownElement);
             }
             
-            // Mettre à jour le compte à rebours
             state.countdownTimer = setInterval(() => {
                 state.countdownValue--;
                 countdownElement.textContent = `Rafraîchissement dans ${state.countdownValue}s`;
                 
                 if (state.countdownValue <= 0) {
                     clearInterval(state.countdownTimer);
-                    location.reload(); // Rafraîchir la page
+                    location.reload();
                 }
             }, 1000);
         }
 
-        async function spin() {
+        function spin() {
             if (state.isSpinning) return;
             
             if (!isWithinTimeRange()) {
@@ -958,4 +962,101 @@
                 resultDiv.innerHTML = `
                     <div class="result-icon">⏰</div>
                     <div class="result-message">Hors horaires !</div>
-                    <
+                    <div>7h à 20h uniquement</div>
+                `;
+                return;
+            }
+
+            if (state.winnersCount >= state.totalPrizes) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'result lose show';
+                resultDiv.innerHTML = `
+                    <div class="result-icon">😔</div>
+                    <div class="result-message">Stock épuisé !</div>
+                    <div>Revenez demain</div>
+                `;
+                return;
+            }
+
+            state.isSpinning = true;
+            document.getElementById('spinButton').disabled = true;
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result';
+            resultDiv.textContent = '';
+
+            const wheel = document.getElementById('wheel');
+            const isWinner = shouldWin();
+            
+            const spins = 6;
+            const baseRotation = 360 * spins;
+            let finalRotation;
+            
+            if (isWinner) {
+                const winAngles = [45, 225];
+                const randomWinAngle = winAngles[Math.floor(Math.random() * winAngles.length)];
+                finalRotation = baseRotation + randomWinAngle;
+            } else {
+                const loseAngles = [135, 315];
+                const randomLoseAngle = loseAngles[Math.floor(Math.random() * loseAngles.length)];
+                finalRotation = baseRotation + randomLoseAngle;
+            }
+
+            // Utiliser l'animation CSS pour la rotation
+            wheel.style.setProperty('--final-rotation', finalRotation + 'deg');
+            wheel.classList.add('spinning');
+
+            setTimeout(() => {
+                state.isSpinning = false;
+                document.getElementById('spinButton').disabled = false;
+                
+                if (isWinner) {
+                    state.winnersCount++;
+                    state.lastWinner = {
+                        time: new Date().toISOString()
+                    };
+                    saveState();
+                    
+                    createConfetti();
+                    createFireworks();
+                    createWinningGlow();
+                    
+                    resultDiv.className = 'result win celebrate show';
+                    resultDiv.innerHTML = `
+                        <div class="result-icon">🎉</div>
+                        <div class="result-message">FÉLICITATIONS !</div>
+                        <div>Vous avez gagné un grille-pain !</div>
+                    `;
+                } else {
+                    resultDiv.className = 'result lose show';
+                    resultDiv.innerHTML = `
+                        <div class="result-icon">😔</div>
+                        <div class="result-message">Dommage...</div>
+                        <div>Retentez votre chance !</div>
+                    `;
+                }
+
+                // Démarrer le compte à rebours
+                startCountdown();
+
+            }, 4000);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Charger Firebase depuis CDN
+            const script = document.createElement('script');
+            script.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
+            script.onload = function() {
+                const script2 = document.createElement('script');
+                script2.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js';
+                script2.onload = function() {
+                    initializeState();
+                    document.getElementById('spinButton').addEventListener('click', spin);
+                };
+                document.head.appendChild(script2);
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>
