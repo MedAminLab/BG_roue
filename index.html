@@ -20,7 +20,7 @@
 
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
         }
 
         @keyframes shimmer {
@@ -30,11 +30,11 @@
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            50% { transform: scale(1.05); }
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(40px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -50,13 +50,13 @@
 
         @keyframes neonPulse {
             0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
-            50% { filter: drop-shadow(0 0 20px currentColor); }
+            50% { filter: drop-shadow(0 0 15px currentColor); }
         }
 
         @keyframes celebration {
             0%, 100% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.15) rotate(-8deg); }
-            75% { transform: scale(1.15) rotate(8deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
         }
 
         body {
@@ -69,7 +69,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             position: relative;
             overflow-x: hidden;
         }
@@ -84,8 +84,8 @@
             background: 
                 radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
                 radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            background-position: 0 0, 25px 25px;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
             animation: float 20s linear infinite;
             pointer-events: none;
         }
@@ -100,8 +100,8 @@
 
         .sparkle {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 3px;
+            height: 3px;
             background: white;
             border-radius: 50%;
             animation: sparkle 2s ease-in-out infinite;
@@ -109,36 +109,37 @@
 
         .confetti {
             position: fixed;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             z-index: 1000;
             animation: confetti 4s ease-out forwards;
         }
 
         .container {
             background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 40px;
-            padding: clamp(30px, 6vw, 50px);
+            backdrop-filter: blur(15px) saturate(180%);
+            border-radius: 25px;
+            padding: 25px 20px;
             box-shadow: 
-                0 30px 80px rgba(0,0,0,0.3),
+                0 20px 50px rgba(0,0,0,0.3),
                 0 0 0 1px rgba(255,255,255,0.2) inset,
-                0 0 100px rgba(255,255,255,0.1);
-            max-width: 650px;
-            width: 95%;
+                0 0 80px rgba(255,255,255,0.1);
+            max-width: 500px;
+            width: 100%;
             text-align: center;
             position: relative;
             z-index: 1;
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 2px solid rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.15);
+            margin: 10px;
         }
 
         .container::before {
             content: '';
             position: absolute;
-            inset: -2px;
-            border-radius: 40px;
-            padding: 2px;
+            inset: -1px;
+            border-radius: 26px;
+            padding: 1px;
             background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
@@ -147,7 +148,7 @@
         }
 
         .header {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         h1 {
@@ -155,55 +156,57 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: clamp(1.8em, 6vw, 3em);
+            font-size: 1.8rem;
             font-weight: 800;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            margin-bottom: 8px;
+            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.3));
             animation: float 4s ease-in-out infinite;
             letter-spacing: 1px;
-            line-height: 1.2;
+            line-height: 1.3;
             white-space: normal;
             text-align: center;
+            padding: 0 10px;
         }
 
         .subtitle {
             color: rgba(255,255,255,0.95);
-            font-size: clamp(1em, 3.5vw, 1.4em);
+            font-size: 1.1rem;
             font-weight: 600;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+            margin-bottom: 10px;
         }
 
         .prize-badge {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             background: linear-gradient(135deg, #ffd700, #ffed4e);
             color: #000;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: clamp(1em, 3vw, 1.2em);
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 1rem;
             font-weight: 700;
-            margin: 20px 0;
+            margin: 15px 0;
             box-shadow: 
-                0 10px 30px rgba(255,215,0,0.4),
+                0 8px 25px rgba(255,215,0,0.4),
                 inset 0 1px 0 rgba(255,255,255,0.6);
             animation: pulse 2s ease-in-out infinite;
         }
 
         .wheel-container {
             position: relative;
-            width: min(380px, 85vw);
-            height: min(380px, 85vw);
-            margin: 40px auto;
+            width: 280px;
+            height: 280px;
+            margin: 25px auto;
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
-            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 15px 35px rgba(0,0,0,0.4));
         }
 
         .wheel-glow {
             position: absolute;
-            inset: -30px;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            inset: -20px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
             border-radius: 50%;
             animation: pulse 3s ease-in-out infinite;
             z-index: -1;
@@ -213,9 +216,9 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 18px solid rgba(255,255,255,0.2);
+            border: 12px solid rgba(255,255,255,0.2);
             position: relative;
-            transition: transform 4.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
             background: conic-gradient(
                 from 0deg,
                 #00d2ff 0deg 90deg,
@@ -224,17 +227,17 @@
                 #ff006e 270deg 360deg
             );
             box-shadow: 
-                0 20px 60px rgba(0,0,0,0.4),
-                inset 0 0 60px rgba(255,255,255,0.1),
-                0 0 0 8px rgba(255,255,255,0.1);
+                0 15px 40px rgba(0,0,0,0.4),
+                inset 0 0 40px rgba(255,255,255,0.1),
+                0 0 0 6px rgba(255,255,255,0.1);
         }
 
         .wheel::before {
             content: '';
             position: absolute;
-            inset: -18px;
+            inset: -12px;
             border-radius: 50%;
-            padding: 3px;
+            padding: 2px;
             background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
@@ -246,29 +249,22 @@
         .wheel::after {
             content: '';
             position: absolute;
-            inset: -25px;
+            inset: -18px;
             border-radius: 50%;
             background: radial-gradient(circle, transparent 60%, rgba(255,255,255,0.1) 100%);
-        }
-
-        .wheel-segments {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            overflow: hidden;
         }
 
         .wheel-text {
             position: absolute;
             width: 100%;
             height: 100%;
-            font-size: clamp(1.1em, 3.5vw, 1.6em);
+            font-size: 1.3rem;
             font-weight: 800;
             color: white;
             text-shadow: 
-                3px 3px 6px rgba(0,0,0,0.6),
-                0 0 20px rgba(0,0,0,0.4);
-            letter-spacing: 1px;
+                2px 2px 4px rgba(0,0,0,0.6),
+                0 0 15px rgba(0,0,0,0.4);
+            letter-spacing: 0.5px;
         }
 
         .wheel-text span {
@@ -279,19 +275,19 @@
         }
 
         .wheel-text span:nth-child(1) {
-            transform: translate(-50%, -50%) rotate(-45deg) translateY(calc(min(380px, 85vw) * -0.32)) rotate(45deg);
+            transform: translate(-50%, -50%) rotate(-45deg) translateY(-90px) rotate(45deg);
         }
 
         .wheel-text span:nth-child(2) {
-            transform: translate(-50%, -50%) rotate(45deg) translateY(calc(min(380px, 85vw) * -0.32)) rotate(-45deg);
+            transform: translate(-50%, -50%) rotate(45deg) translateY(-90px) rotate(-45deg);
         }
 
         .wheel-text span:nth-child(3) {
-            transform: translate(-50%, -50%) rotate(135deg) translateY(calc(min(380px, 85vw) * -0.32)) rotate(-135deg);
+            transform: translate(-50%, -50%) rotate(135deg) translateY(-90px) rotate(-135deg);
         }
 
         .wheel-text span:nth-child(4) {
-            transform: translate(-50%, -50%) rotate(225deg) translateY(calc(min(380px, 85vw) * -0.32)) rotate(-225deg);
+            transform: translate(-50%, -50%) rotate(225deg) translateY(-90px) rotate(-225deg);
         }
 
         .wheel-center {
@@ -299,29 +295,29 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: min(70px, 17vw);
-            height: min(70px, 17vw);
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #1a1a2e, #0f3460);
             border-radius: 50%;
-            border: 6px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255,255,255,0.3);
             z-index: 10;
             box-shadow: 
-                0 8px 25px rgba(0,0,0,0.5),
-                inset 0 2px 8px rgba(255,255,255,0.2);
+                0 6px 20px rgba(0,0,0,0.5),
+                inset 0 1px 6px rgba(255,255,255,0.2);
         }
 
         .pointer {
             position: absolute;
-            top: -25px;
+            top: -18px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: clamp(18px, 5vw, 25px) solid transparent;
-            border-right: clamp(18px, 5vw, 25px) solid transparent;
-            border-top: clamp(40px, 10vw, 50px) solid #ff006e;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ff006e;
             z-index: 15;
-            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
             animation: neonPulse 2s ease-in-out infinite;
         }
 
@@ -329,23 +325,23 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: clamp(18px, 4vw, 25px) clamp(40px, 10vw, 60px);
-            font-size: clamp(1.2em, 4vw, 1.8em);
-            border-radius: 60px;
+            padding: 16px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 
-                0 15px 35px rgba(102, 126, 234, 0.5),
-                inset 0 2px 0 rgba(255,255,255,0.3);
-            margin-top: 30px;
-            width: auto;
-            max-width: 90%;
+                0 12px 30px rgba(102, 126, 234, 0.5),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            margin-top: 20px;
+            width: 100%;
+            max-width: 280px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             position: relative;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .spin-button::before {
@@ -355,42 +351,42 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             animation: shimmer 2s linear infinite;
         }
 
         .spin-button:hover:not(:disabled) {
-            transform: translateY(-5px) scale(1.05);
+            transform: translateY(-3px) scale(1.03);
             box-shadow: 
-                0 20px 50px rgba(102, 126, 234, 0.6),
-                inset 0 2px 0 rgba(255,255,255,0.3);
+                0 15px 40px rgba(102, 126, 234, 0.6),
+                inset 0 1px 0 rgba(255,255,255,0.3);
         }
 
         .spin-button:active:not(:disabled) {
-            transform: translateY(-2px) scale(1.02);
+            transform: translateY(-1px) scale(1.01);
         }
 
         .spin-button:disabled {
             background: linear-gradient(135deg, #888 0%, #666 100%);
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.6;
             transform: none;
         }
 
         .result {
-            margin-top: 35px;
-            padding: clamp(20px, 4vw, 28px);
-            border-radius: 25px;
-            font-size: clamp(1.1em, 3.5vw, 1.5em);
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 1.2rem;
             font-weight: 700;
-            min-height: 70px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.9);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .result.show {
@@ -402,41 +398,41 @@
             background: linear-gradient(135deg, #00f260 0%, #0575e6 100%);
             color: white;
             box-shadow: 
-                0 15px 40px rgba(0,242,96,0.4),
+                0 12px 30px rgba(0,242,96,0.4),
                 inset 0 1px 0 rgba(255,255,255,0.3);
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
         .result.lose {
             background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
             color: white;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
 
         .stock-counter {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
+            top: 15px;
+            right: 15px;
+            padding: 10px 16px;
             background: linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.2) 100%);
-            border: 2px solid rgba(255,215,0,0.5);
-            border-radius: 50px;
-            font-size: clamp(1.2em, 4vw, 1.6em);
+            border: 1px solid rgba(255,215,0,0.5);
+            border-radius: 40px;
+            font-size: 1.3rem;
             color: #ffd700;
             font-weight: 800;
             box-shadow: 
-                0 5px 20px rgba(255,193,7,0.3),
+                0 4px 15px rgba(255,193,7,0.3),
                 inset 0 1px 0 rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
-            min-width: 60px;
+            min-width: 50px;
             text-align: center;
         }
 
         .stock-counter strong {
             color: #ffd700;
-            font-size: 1em;
-            text-shadow: 0 2px 10px rgba(255,215,0,0.5);
+            font-size: 1rem;
+            text-shadow: 0 2px 8px rgba(255,215,0,0.5);
         }
 
         .stock-empty {
@@ -450,59 +446,119 @@
         }
 
         .last-winner {
-            margin-top: 20px;
-            padding: 20px;
+            margin-top: 15px;
+            padding: 15px;
             background: linear-gradient(135deg, rgba(0,210,255,0.3) 0%, rgba(35,166,213,0.2) 100%);
-            border: 2px solid rgba(0,210,255,0.5);
-            border-radius: 25px;
-            font-size: clamp(1em, 3vw, 1.2em);
+            border: 1px solid rgba(0,210,255,0.5);
+            border-radius: 20px;
+            font-size: 1rem;
             color: white;
             display: none;
             font-weight: 600;
             box-shadow: 
-                0 10px 30px rgba(0,210,255,0.3),
+                0 8px 25px rgba(0,210,255,0.3),
                 inset 0 1px 0 rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
         }
 
         .celebrate {
-            animation: celebration 0.6s ease-in-out 4;
+            animation: celebration 0.5s ease-in-out 3;
         }
 
         .loading {
             color: white;
-            font-size: 1em;
+            font-size: 0.9rem;
             font-weight: 600;
         }
 
-        @media (max-width: 480px) {
+        /* Responsive pour très petits écrans */
+        @media (max-width: 380px) {
             .container {
-                padding: 25px;
-                border-radius: 30px;
+                padding: 20px 15px;
+                border-radius: 20px;
+                margin: 5px;
             }
             
             h1 {
-                font-size: 1.5em;
-                white-space: normal;
-                line-height: 1.3;
+                font-size: 1.5rem;
+                padding: 0 5px;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .wheel-container {
+                width: 240px;
+                height: 240px;
+                margin: 20px auto;
+            }
+            
+            .wheel-text {
+                font-size: 1.1rem;
+            }
+            
+            .wheel-text span:nth-child(1) {
+                transform: translate(-50%, -50%) rotate(-45deg) translateY(-75px) rotate(45deg);
+            }
+            
+            .wheel-text span:nth-child(2) {
+                transform: translate(-50%, -50%) rotate(45deg) translateY(-75px) rotate(-45deg);
+            }
+            
+            .wheel-text span:nth-child(3) {
+                transform: translate(-50%, -50%) rotate(135deg) translateY(-75px) rotate(-135deg);
+            }
+            
+            .wheel-text span:nth-child(4) {
+                transform: translate(-50%, -50%) rotate(225deg) translateY(-75px) rotate(-225deg);
+            }
+            
+            .prize-badge {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .spin-button {
+                padding: 14px 30px;
+                font-size: 1.1rem;
+                max-width: 240px;
             }
             
             .stock-counter {
                 top: 10px;
                 right: 10px;
-                padding: 8px 15px;
-                font-size: 1.2em;
+                padding: 8px 12px;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Responsive pour tablettes et grands écrans */
+        @media (min-width: 768px) {
+            .container {
+                padding: 30px 25px;
+                max-width: 450px;
             }
             
             .wheel-container {
-                width: min(320px, 80vw);
-                height: min(320px, 80vw);
-                margin: 30px auto;
+                width: 320px;
+                height: 320px;
             }
             
-            .prize-badge {
-                padding: 12px 20px;
-                font-size: 0.9em;
+            .wheel-text span:nth-child(1) {
+                transform: translate(-50%, -50%) rotate(-45deg) translateY(-105px) rotate(45deg);
+            }
+            
+            .wheel-text span:nth-child(2) {
+                transform: translate(-50%, -50%) rotate(45deg) translateY(-105px) rotate(-45deg);
+            }
+            
+            .wheel-text span:nth-child(3) {
+                transform: translate(-50%, -50%) rotate(135deg) translateY(-105px) rotate(-135deg);
+            }
+            
+            .wheel-text span:nth-child(4) {
+                transform: translate(-50%, -50%) rotate(225deg) translateY(-105px) rotate(-225deg);
             }
         }
     </style>
@@ -576,7 +632,7 @@
         // Créer des étoiles scintillantes
         function createSparkles() {
             const sparklesContainer = document.getElementById('sparkles');
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 25; i++) {
                 const sparkle = document.createElement('div');
                 sparkle.className = 'sparkle';
                 sparkle.style.left = Math.random() * 100 + '%';
@@ -685,14 +741,14 @@
             const colors = ['#ff006e', '#00d2ff', '#ffd700', '#00f260', '#ff6b6b', '#4ecdc4'];
             const shapes = ['○', '●', '◆', '■', '★', '▲'];
             
-            for (let i = 0; i < 80; i++) {
+            for (let i = 0; i < 60; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
                     confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
                     confetti.style.left = Math.random() * 100 + 'vw';
                     confetti.style.color = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                    confetti.style.fontSize = (Math.random() * 15 + 10) + 'px';
                     confetti.style.animationDelay = Math.random() * 0.3 + 's';
                     confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
                     document.body.appendChild(confetti);
@@ -775,7 +831,7 @@
                     resultDiv.className = 'result lose show';
                     resultDiv.innerHTML = '😔 <strong>Dommage...</strong><br>Retentez votre chance !';
                 }
-            }, 4500);
+            }, 4000);
         }
 
         // Initialisation
