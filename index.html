@@ -6,6 +6,7 @@
     <title>🎰 Tentez votre chance !</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* VOTRE CSS EXISTANT RESTE IDENTIQUE */
         * {
             margin: 0;
             padding: 0;
@@ -691,7 +692,8 @@
         const state = {
             winnersCount: 0,
             isSpinning: false,
-            totalPrizes: 10,
+            totalPrizes: 10,           // 10 grille-pains
+            estimatedClients: 200,     // 200 clients estimés
             lastWinner: null
         };
 
@@ -864,14 +866,18 @@
         function isWithinTimeRange() {
             const now = new Date();
             const hour = now.getHours();
-            return hour >= 7 && hour < 20;
+            return hour >= 7 && hour < 20;  // 7h à 20h
         }
 
         function shouldWin() {
+            // Plus de stock = plus de gagnants
             if (state.winnersCount >= state.totalPrizes) {
                 return false;
             }
-            return Math.random() < 0.30;
+            
+            // Calcul de probabilité basé sur le ratio stock/clients
+            const winProbability = state.totalPrizes / state.estimatedClients; // 10/200 = 0.05 (5%)
+            return Math.random() < winProbability;
         }
 
         async function spin() {
@@ -913,11 +919,11 @@
             let finalRotation;
             
             if (isWinner) {
-                const winAngles = [45, 225];
+                const winAngles = [45, 225];        // Positions GAGNÉ
                 const randomWinAngle = winAngles[Math.floor(Math.random() * winAngles.length)];
                 finalRotation = baseRotation + randomWinAngle;
             } else {
-                const loseAngles = [135, 315];
+                const loseAngles = [135, 315];      // Positions PERDU
                 const randomLoseAngle = loseAngles[Math.floor(Math.random() * loseAngles.length)];
                 finalRotation = baseRotation + randomLoseAngle;
             }
@@ -963,4 +969,5 @@
             document.getElementById('spinButton').addEventListener('click', spin);
         });
     </script>
-</
+</body>
+</html>
