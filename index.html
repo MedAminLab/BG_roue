@@ -76,6 +76,11 @@
             50% { box-shadow: 0 0 40px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.6); }
         }
 
+        @keyframes countdown {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.7; }
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
@@ -429,6 +434,7 @@
             line-height: 1.4;
             flex-direction: column;
             gap: 8px;
+            position: relative;
         }
 
         .result.show {
@@ -462,6 +468,19 @@
         .result-message {
             font-size: 1.1rem;
             font-weight: 600;
+        }
+
+        .countdown {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: countdown 1s ease-in-out infinite;
         }
 
         .stock-counter {
@@ -607,6 +626,12 @@
             .stock-counter strong {
                 font-size: 1.1rem;
             }
+            
+            .countdown {
+                font-size: 0.8rem;
+                bottom: 8px;
+                right: 12px;
+            }
         }
 
         /* Responsive pour tablettes et grands écrans */
@@ -712,7 +737,9 @@
             isSpinning: false,
             totalPrizes: 10,           // 10 grille-pains
             estimatedClients: 200,     // 200 clients estimés
-            lastWinner: null
+            lastWinner: null,
+            countdownTimer: null,
+            countdownValue: 10
         };
 
         // Créer des étoiles scintillantes
@@ -898,6 +925,30 @@
             return Math.random() < winProbability;
         }
 
+        function startCountdown() {
+            state.countdownValue = 10;
+            const resultDiv = document.getElementById('result');
+            
+            // Créer l'élément de compte à rebours
+            let countdownElement = resultDiv.querySelector('.countdown');
+            if (!countdownElement) {
+                countdownElement = document.createElement('div');
+                countdownElement.className = 'countdown';
+                resultDiv.appendChild(countdownElement);
+            }
+            
+            // Mettre à jour le compte à rebours
+            state.countdownTimer = setInterval(() => {
+                state.countdownValue--;
+                countdownElement.textContent = `Rafraîchissement dans ${state.countdownValue}s`;
+                
+                if (state.countdownValue <= 0) {
+                    clearInterval(state.countdownTimer);
+                    location.reload(); // Rafraîchir la page
+                }
+            }, 1000);
+        }
+
         async function spin() {
             if (state.isSpinning) return;
             
@@ -907,52 +958,4 @@
                 resultDiv.innerHTML = `
                     <div class="result-icon">⏰</div>
                     <div class="result-message">Hors horaires !</div>
-                    <div>7h à 20h uniquement</div>
-                `;
-                return;
-            }
-
-            if (state.winnersCount >= state.totalPrizes) {
-                const resultDiv = document.getElementById('result');
-                resultDiv.className = 'result lose show';
-                resultDiv.innerHTML = `
-                    <div class="result-icon">😔</div>
-                    <div class="result-message">Stock épuisé !</div>
-                    <div>Revenez demain</div>
-                `;
-                return;
-            }
-
-            state.isSpinning = true;
-            document.getElementById('spinButton').disabled = true;
-            const resultDiv = document.getElementById('result');
-            resultDiv.className = 'result';
-            resultDiv.textContent = '';
-
-            const wheel = document.getElementById('wheel');
-            const isWinner = shouldWin();
-            
-            const spins = 6;
-            const baseRotation = 360 * spins;
-            let finalRotation;
-            
-            if (isWinner) {
-                const winAngles = [45, 225];        // Positions GAGNÉ
-                const randomWinAngle = winAngles[Math.floor(Math.random() * winAngles.length)];
-                finalRotation = baseRotation + randomWinAngle;
-            } else {
-                const loseAngles = [135, 315];      // Positions PERDU
-                const randomLoseAngle = loseAngles[Math.floor(Math.random() * loseAngles.length)];
-                finalRotation = baseRotation + randomLoseAngle;
-            }
-
-            wheel.style.transform = `rotate(${finalRotation}deg)`;
-
-            setTimeout(async () => {
-                state.isSpinning = false;
-                document.getElementById('spinButton').disabled = false;
-                
-                if (isWinner) {
-                    state.winnersCount++;
-                    state.lastWinner = {
-                        time: new Date().toISO
+                    <
